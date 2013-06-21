@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block body %}
+<table>
+<tr>
+<td>ID</td><td>Name</td><td>Path</td>
+</tr>
+{% for movie in movies %}
+<tr>
+<td width=40px>{{movie[0]}}</td><td>{{movie[1]}}</td><td>{{movie[2]}}</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

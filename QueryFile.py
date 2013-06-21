@@ -3,11 +3,32 @@ __version__ = 1.0
 
 import os, glob,sqlite3
 
+cwdir = os.getcwd()
+def init_db():
+	conn = sqlite3.connect(r'files.db')
+	c = conn.cursor()
+		
+	c.execute("drop table if exists movies")
+	conn.commit()
+	
+	#initialize table
+	createSql = """create table movies (
+		id integer primary key,
+		name text not null,
+		path text not null
+		)"""
+
+	c.execute(createSql)
+	conn.commit()
+
+
 def QueryFile(fileName):
   	roots = []
 	dirs = []
 	subdirs=[]
 	files = []
+	
+	os.chdir(os.getcwd()[:3])
 
 	for f in glob.glob('*.%s' %fileName):
 		files.append('%s%s' %(os.getcwd(),f))
@@ -15,9 +36,11 @@ def QueryFile(fileName):
 	for r in os.listdir(os.getcwd()):
 		if os.path.isdir(r):
 				roots.append(r)
-
-	roots.remove('$RECYCLE.BIN')
-	roots.remove('System Volume Information')
+	try:
+		roots.remove('$RECYCLE.BIN')
+		roots.remove('System Volume Information')
+	except:
+		pass
 
 	for root in roots:
 		for root,dir,file in os.walk(root):	
@@ -29,31 +52,17 @@ def QueryFile(fileName):
 		for f in glob.glob('*.%s' %fileName):
 			files.append('%s%s\%s' %(os.getcwd()[:3],d,f))
 
-	os.chdir(os.getcwd()[:3])
+	os.chdir(cwdir)
 
 	#open and write to db
 	conn = sqlite3.connect(r'files.db')
 	conn.text_factory = str
 	c = conn.cursor()
 	
-	#initialize table
-	createSql = """create table movies (
-		id integer primary key,
-		name text not null,
-		path text not null
-		)"""
-	
-	c.execute("drop table if exists movies")
-	conn.commit()
-
-	c.execute(createSql)
-	conn.commit()
-
 	#insert data
 	i = 0
 	for f in files:
 		fName = f[f.rfind('\\')+1:]
-		print fName,f
 		c.execute("insert into movies values (?,?,?)",(i,fName,f))
 		i+=1
 
@@ -65,5 +74,10 @@ def QueryFile(fileName):
 
 	conn.close()
 
-QueryFile('mkv')
+def run():
+	init_db()
+	fileTypes = ['zip']
+
+	for ft in fileTypes:
+			QueryFile(ft)
 
