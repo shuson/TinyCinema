@@ -35,4 +35,4 @@ nosetests.xml
 .pydevproject
 
 # ignore bak file from editplus
-.bak
+*.bak
