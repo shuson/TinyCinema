@@ -1,5 +1,5 @@
 #
-# 
+# author:shuson
 #
 import QueryFile
 import sqlite3
